@@ -1,0 +1,38 @@
+---
+- name: Create Redis group
+  ansible.builtin.group:
+    name: redis
+    gid: "{{ redis_gid }}"
+    state: present
+
+- name: Create Redis user
+  ansible.builtin.user:
+    name: redis
+    uid: "{{ redis_uid }}"
+    group: "{{ redis_gid }}"
+    system: true
+    state: present
+
+- name: Add redis repo
+  ansible.builtin.apt_repository:
+    repo: "{{ redis_apt_repo }}"
+
+- name: Add redis repo key
+  ansible.builtin.apt_key:
+    url: "{{ redis_apt_key }}"
+  when: "redis_apt_key is defined"
+
+- name: Run apt update
+  ansible.builtin.apt:
+    update_cache: yes
+    force_apt_get: yes
+    cache_valid_time: 3600
+
+- name: "Install packages"
+  ansible.builtin.apt:
+    name: "{{ package }}"
+    state: present
+    force: True
+  loop: "{{ redis_packages }}"
+  loop_control:
+    loop_var: package

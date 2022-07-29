@@ -1,0 +1,8 @@
+---
+- name: Redis Setup
+  become: yes
+  hosts: big-redis-group
+  roles:
+    - redis
+  vars:
+    ansible_ssh_common_args: '-J 192.168.88.1'
